@@ -45,14 +45,14 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* Right Image (mockup or chart) */}
-        <div className="relative">
+        {/* Right Image  */}
+        {/* <div className="relative">
           <img
             src="/mock-dashboard.png"
             alt="Dashboard"
             className="rounded-2xl shadow-2xl w-[450px] hover:scale-105 transition-transform duration-700"
           />
-        </div>
+        </div> */}
       </div>
     </section>
   );

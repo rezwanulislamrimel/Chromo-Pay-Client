@@ -1,60 +1,97 @@
-import React, { useState, useEffect } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
-import { SunIcon, MoonIcon } from "@heroicons/react/24/outline";
+import React, { useState, useEffect } from "react";
+import { Link, NavLink } from "react-router-dom";
+import { Menu, X } from "lucide-react";
 
-import { toggleTheme } from '../utils/theme'
-import { Sun, Moon } from 'lucide-react'
-
-export default function Header(){
-//   const location = useLocation()
-  const [dark, setDark] = useState(() => {
-    try {
-      const s = localStorage.getItem('chromo-theme')
-      if (s) return s === 'dark'
-      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-    } catch { return false }
-  })
+export default function Header() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    toggleTheme(dark ? 'dark' : 'light')
-  }, [dark])
-
-  const nav = [
-    {name:'Home', to:'/'},
-    {name:'Docs', to:'/docs'},
-    {name:'Pricing', to:'/pricing'},
-    {name:'Contact', to:'/contact'}
-  ]
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur bg-white/70 dark:bg-[#071025]/70 border-b">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-md" style={{background:'linear-gradient(90deg,#6c5ce7,#00d4ff)'}} />
-          <div className="font-extrabold">Chromo<span className="font-bold">Pay</span></div>
+    <header
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+        isScrolled
+          ? "bg-white/80 backdrop-blur-md shadow-sm"
+          : "bg-transparent"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        {/* Logo */}
+        <Link to="/" className="text-2xl font-bold text-indigo-600">
+          chromo<span className="text-gray-900">Pay</span>
         </Link>
 
-        <nav className="hidden lg:flex gap-6 text-sm">
-          {nav.map(i => (
-            <NavLink key={i.to} to={i.to} className={({isActive})=>isActive ? 'underline' : ''}>
-              {i.name}
-            </NavLink>
-          ))}
+        {/* Desktop Menu */}
+        <nav className="hidden md:flex items-center gap-8">
+          {["Products", "Solutions", "Developers", "Resources", "Pricing"].map(
+            (item) => (
+              <NavLink
+                key={item}
+                to={`/${item.toLowerCase()}`}
+                className="text-gray-700 hover:text-indigo-600 text-sm font-medium transition"
+              >
+                {item}
+              </NavLink>
+            )
+          )}
         </nav>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={()=>setDark(d=>!d)}
-            aria-label="Toggle theme"
-            className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+        {/* Right Buttons */}
+        <div className="hidden md:flex items-center gap-4">
+          <Link
+            to="/signin"
+            className="text-gray-700 hover:text-indigo-600 text-sm font-medium"
           >
-            {dark ? <Sun size={16} /> : <Moon size={16} />}
+            Sign in
+          </Link>
+          <button className="bg-indigo-600 text-white text-sm font-medium px-5 py-2.5 rounded-full hover:bg-indigo-700 transition">
+            Contact Sales
           </button>
-
-          <Link to="/dashboard" className="btn btn-sm">Dashboard</Link>
-          <Link to="/contact" className="btn btn-sm bg-chromoPrimary text-white">Get started</Link>
         </div>
+
+        {/* Mobile Menu Button */}
+        <button
+          className="md:hidden text-gray-800"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {isOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </div>
+
+      {/* Mobile Menu */}
+      {isOpen && (
+        <div className="md:hidden bg-white/95 backdrop-blur-md border-t border-gray-100 px-6 py-4 space-y-4">
+          {["Products", "Solutions", "Developers", "Resources", "Pricing"].map(
+            (item) => (
+              <NavLink
+                key={item}
+                to={`/${item.toLowerCase()}`}
+                className="block text-gray-700 hover:text-indigo-600 text-base font-medium transition"
+              >
+                {item}
+              </NavLink>
+            )
+          )}
+          <div className="pt-4 border-t border-gray-100 flex flex-col gap-3">
+            <Link
+              to="/signin"
+              className="text-gray-700 hover:text-indigo-600 text-sm font-medium"
+            >
+              Sign in
+            </Link>
+            <button className="bg-indigo-600 text-white text-sm font-medium px-5 py-2.5 rounded-full hover:bg-indigo-700 transition">
+              Contact Sales
+            </button>
+          </div>
+        </div>
+      )}
     </header>
-  )
+  );
 }
